@@ -31,6 +31,13 @@ const background = new Sprite({ position: { x: -750, y: -600 }, image: backgroun
 const playerDown = new Image();
 playerDown.src = './img/playerDown.png';
 
+const keys = {
+  ArrowUp: { isPressed: false },
+  ArrowDown: { isPressed: false },
+  ArrowLeft: { isPressed: false },
+  ArrowRight: { isPressed: false },
+};
+
 const animate = () => {
   window.requestAnimationFrame(animate);
   background.draw();
@@ -45,10 +52,55 @@ const animate = () => {
     playerDown.width / 4,
     playerDown.height
   );
+
+  if (keys.ArrowDown.isPressed) background.position.y -= 2;
+  if (keys.ArrowUp.isPressed) background.position.y += 2;
+  if (keys.ArrowLeft.isPressed) background.position.x += 2;
+  if (keys.ArrowRight.isPressed) background.position.x -= 2;
 };
 
 animate();
 
+const lastKeyPressed = '';
+
 window.addEventListener('keydown', (event) => {
-  console.log('Yay');
+  switch (event.key) {
+    case 'ArrowUp':
+      keys.ArrowUp.isPressed = true;
+      lastKeyPressed = 'ArrowUp';
+      break;
+    case 'ArrowDown':
+      keys.ArrowDown.isPressed = true;
+      lastKeyPressed = 'ArrowDown';
+      break;
+    case 'ArrowLeft':
+      keys.ArrowLeft.isPressed = true;
+      lastKeyPressed = 'ArrowLeft';
+      break;
+    case 'ArrowRight':
+      keys.ArrowRight.isPressed = true;
+      lastKeyPressed = 'ArrowRight';
+      break;
+    case 'a':
+      console.log(keys);
+  }
+});
+
+window.addEventListener('keyup', (event) => {
+  switch (event.key) {
+    case 'ArrowUp':
+      keys.ArrowUp.isPressed = false;
+      break;
+    case 'ArrowDown':
+      keys.ArrowDown.isPressed = false;
+      break;
+    case 'ArrowLeft':
+      keys.ArrowLeft.isPressed = false;
+      break;
+    case 'ArrowRight':
+      keys.ArrowRight.isPressed = false;
+      break;
+    case 'a':
+      console.log(keys);
+  }
 });
