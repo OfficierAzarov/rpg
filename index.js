@@ -8,8 +8,11 @@ class Sprite {
     this.position = position;
     this.velocity = velocity;
     this.frames = frames;
-    this.width = this.image.width / this.frames.max;
-    this.height = image.height;
+
+    this.image.onload = () => {
+      this.width = this.image.width / this.frames.max;
+      this.height = image.height;
+    };
   }
 
   /**
@@ -22,12 +25,12 @@ class Sprite {
       this.image,
       0,
       0,
-      this.image.width / this.frames.max,
-      this.image.height,
+      this.width,
+      this.height,
       this.position.x,
       this.position.y,
-      this.image.width / this.frames.max,
-      this.image.height
+      this.width,
+      this.height
     );
   }
 }
@@ -119,6 +122,15 @@ const keys = {
 
 let lastKeyPressed = '';
 
+const detectRectangularCollision = ({ rectangle1, rectangle2 }) => {
+  return (
+    rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+    rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+    rectangle1.position.y + rectangle1.height >= rectangle2.position.y &&
+    rectangle1.position.y <= rectangle2.position.y + rectangle2.height
+  );
+};
+
 const movables = [background, testBoundary];
 
 const move = (movable, axis, value) => {
@@ -131,17 +143,10 @@ const animate = () => {
   // boundaries.forEach((boundary) => boundary.draw());
   testBoundary.draw();
   player.draw();
-  // context.drawImage(
-  //   playerDown,
-  //   0,
-  //   0,
-  //   playerDown.width / 4,
-  //   playerDown.height,
-  //   canvas.width / 2 - playerDown.width / 4 / 2,
-  //   canvas.height / 2 - playerDown.height / 2,
-  //   playerDown.width / 4,
-  //   playerDown.height
-  // );
+
+  if (detectRectangularCollision({ rectangle1: player, rectangle2: testBoundary })) {
+    console.log('colliding');
+  }
 
   if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp')
     movables.forEach((movable) => move(movable, 'y', 2));
