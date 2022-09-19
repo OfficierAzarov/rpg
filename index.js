@@ -3,14 +3,32 @@
  */
 
 class Sprite {
-  constructor({ image, position, velocity }) {
+  constructor({ image, position, velocity, frames = { max: 1 } }) {
     this.image = image;
     this.position = position;
     this.velocity = velocity;
+    this.frames = frames;
+    this.width = this.image.width / this.frames.max;
+    this.height = image.height;
   }
 
+  /**
+   * 2nd to 5th arguments: cropping image
+   * 6th-7th arguments: x & y position
+   * 8th-9th arguments: size of the image
+   */
   draw() {
-    context.drawImage(this.image, this.position.x, this.position.y);
+    context.drawImage(
+      this.image,
+      0,
+      0,
+      this.image.width / this.frames.max,
+      this.image.height,
+      this.position.x,
+      this.position.y,
+      this.image.width / this.frames.max,
+      this.image.height
+    );
   }
 }
 
@@ -46,6 +64,22 @@ const backgroundImage = new Image();
 backgroundImage.src = './img/town.png';
 const background = new Sprite({ position: { x: offset.x, y: offset.y }, image: backgroundImage });
 
+const playerImage = new Image();
+playerImage.src = './img/playerDown.png';
+const playerImageWidth = 192;
+const playerImageHeight = 68;
+
+const player = new Sprite({
+  image: playerImage,
+  frames: {
+    max: 4,
+  },
+  position: {
+    x: canvas.width / 2 - playerImageWidth / 4 / 2,
+    y: canvas.height / 2 - playerImageHeight / 2,
+  },
+});
+
 const collisionsMap = [];
 
 for (let i = 0; i < collisions.length; i += 70) {
@@ -69,10 +103,12 @@ collisionsMap.forEach((row, i) => {
   });
 });
 
-console.log(boundaries);
-
-const playerDown = new Image();
-playerDown.src = './img/playerDown.png';
+const testBoundary = new Boundary({
+  position: {
+    x: 400,
+    y: 400,
+  },
+});
 
 const keys = {
   ArrowUp: { isPressed: false },
@@ -83,26 +119,38 @@ const keys = {
 
 let lastKeyPressed = '';
 
+const movables = [background, testBoundary];
+
+const move = (movable, axis, value) => {
+  movable.position[axis] = movable.position[axis] + value;
+};
+
 const animate = () => {
   window.requestAnimationFrame(animate); // repaints the screen each frame rate (60fps by default?) with the animate function
   background.draw();
-  boundaries.forEach((boundary) => boundary.draw());
-  context.drawImage(
-    playerDown,
-    0,
-    0,
-    playerDown.width / 4,
-    playerDown.height,
-    canvas.width / 2 - playerDown.width / 4 / 2,
-    canvas.height / 2 - playerDown.height / 2,
-    playerDown.width / 4,
-    playerDown.height
-  );
+  // boundaries.forEach((boundary) => boundary.draw());
+  testBoundary.draw();
+  player.draw();
+  // context.drawImage(
+  //   playerDown,
+  //   0,
+  //   0,
+  //   playerDown.width / 4,
+  //   playerDown.height,
+  //   canvas.width / 2 - playerDown.width / 4 / 2,
+  //   canvas.height / 2 - playerDown.height / 2,
+  //   playerDown.width / 4,
+  //   playerDown.height
+  // );
 
-  if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp') background.position.y += 2;
-  if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown') background.position.y -= 2;
-  if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft') background.position.x += 2;
-  if (keys.ArrowRight.isPressed && lastKeyPressed == 'ArrowRight') background.position.x -= 2;
+  if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp')
+    movables.forEach((movable) => move(movable, 'y', 2));
+  if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown')
+    movables.forEach((movable) => move(movable, 'y', -2));
+  if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft')
+    movables.forEach((movable) => move(movable, 'x', 2));
+  if (keys.ArrowRight.isPressed && lastKeyPressed == 'ArrowRight')
+    movables.forEach((movable) => move(movable, 'x', -2));
 };
 
 animate();
