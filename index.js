@@ -79,7 +79,7 @@ const player = new Sprite({
   },
   position: {
     x: canvas.width / 2 - playerImageWidth / 4 / 2,
-    y: canvas.height / 2 - playerImageHeight / 2,
+    y: canvas.height / 1.5 - playerImageHeight / 2,
   },
 });
 
@@ -106,13 +106,6 @@ collisionsMap.forEach((row, i) => {
   });
 });
 
-const testBoundary = new Boundary({
-  position: {
-    x: 400,
-    y: 400,
-  },
-});
-
 const keys = {
   ArrowUp: { isPressed: false },
   ArrowDown: { isPressed: false },
@@ -131,7 +124,9 @@ const detectRectangularCollision = ({ rectangle1, rectangle2 }) => {
   );
 };
 
-const movables = [background, testBoundary];
+const movables = [background, ...boundaries];
+
+const stepValue = 2;
 
 const move = (movable, axis, value) => {
   movable.position[axis] = movable.position[axis] + value;
@@ -139,23 +134,31 @@ const move = (movable, axis, value) => {
 
 const animate = () => {
   window.requestAnimationFrame(animate); // repaints the screen each frame rate (60fps by default?) with the animate function
+  let canMove = true;
   background.draw();
-  // boundaries.forEach((boundary) => boundary.draw());
-  testBoundary.draw();
+  boundaries.forEach((boundary) => {
+    boundary.draw();
+  });
   player.draw();
 
-  if (detectRectangularCollision({ rectangle1: player, rectangle2: testBoundary })) {
-    console.log('colliding');
+  if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp') {
+    canMove = canGoThroughBoundaries(boundaries, 'y', stepValue);
+    console.log(canMove);
+    if (canMove) movables.forEach((movable) => move(movable, 'y', stepValue));
   }
-
-  if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp')
-    movables.forEach((movable) => move(movable, 'y', 2));
-  if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown')
-    movables.forEach((movable) => move(movable, 'y', -2));
-  if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft')
-    movables.forEach((movable) => move(movable, 'x', 2));
-  if (keys.ArrowRight.isPressed && lastKeyPressed == 'ArrowRight')
-    movables.forEach((movable) => move(movable, 'x', -2));
+  if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown') {
+    canMove = canGoThroughBoundaries(boundaries, 'y', -stepValue);
+    console.log(canMove);
+    if (canMove) movables.forEach((movable) => move(movable, 'y', -stepValue));
+  }
+  if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft') {
+    canMove = canGoThroughBoundaries(boundaries, 'x', stepValue);
+    if (canMove) movables.forEach((movable) => move(movable, 'x', stepValue));
+  }
+  if (keys.ArrowRight.isPressed && lastKeyPressed == 'ArrowRight') {
+    canMove = canGoThroughBoundaries(boundaries, 'x', -stepValue);
+    if (canMove) movables.forEach((movable) => move(movable, 'x', -stepValue));
+  }
 };
 
 animate();
@@ -178,8 +181,6 @@ window.addEventListener('keydown', (event) => {
       keys.ArrowRight.isPressed = true;
       lastKeyPressed = 'ArrowRight';
       break;
-    case 'a':
-      console.log(keys);
   }
 });
 
@@ -199,3 +200,26 @@ window.addEventListener('keyup', (event) => {
       break;
   }
 });
+
+function canGoThroughBoundaries(boundaries, modifiedPosition, stepValue) {
+  for (let i = 0; i < boundaries.length; i++) {
+    const boundary = boundaries[i];
+    console.log(stepValue);
+    if (
+      detectRectangularCollision({
+        rectangle1: player,
+        rectangle2: {
+          ...boundary,
+          position: {
+            ...boundary.position,
+            [modifiedPosition]: boundary.position[modifiedPosition] + stepValue,
+          },
+        },
+      })
+    ) {
+      console.log('detected');
+      return false;
+    }
+  }
+  return true;
+}
