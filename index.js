@@ -14,6 +14,13 @@ const backgroundImage = new Image();
 backgroundImage.src = './img/town.png';
 const background = new Sprite({ position: { x: offset.x, y: offset.y }, image: backgroundImage });
 
+const foregroundImage = new Image();
+foregroundImage.src = './img/foreground.png';
+const foreground = new Sprite({
+  position: { x: offset.x, y: offset.y },
+  image: foregroundImage,
+});
+
 const playerImage = new Image();
 playerImage.src = './img/playerDown.png';
 const playerImageWidth = 192;
@@ -71,7 +78,7 @@ const detectRectangularCollision = ({ rectangle1, rectangle2 }) => {
   );
 };
 
-const movables = [background, ...boundaries];
+const movables = [background, foreground, ...boundaries];
 
 const stepValue = 2;
 
@@ -87,15 +94,14 @@ const animate = () => {
     boundary.draw();
   });
   player.draw();
+  foreground.draw();
 
   if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp') {
     canMove = canGoThroughBoundaries(boundaries, 'y', stepValue);
-    console.log(canMove);
     if (canMove) movables.forEach((movable) => move(movable, 'y', stepValue));
   }
   if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown') {
     canMove = canGoThroughBoundaries(boundaries, 'y', -stepValue);
-    console.log(canMove);
     if (canMove) movables.forEach((movable) => move(movable, 'y', -stepValue));
   }
   if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft') {
@@ -153,7 +159,6 @@ function canGoThroughBoundaries(boundaries, axis, stepValue) {
     if (axis == 'x' || axis == 'y') {
       for (let i = 0; i < boundaries.length; i++) {
         const boundary = boundaries[i];
-        console.log(stepValue);
         if (
           detectRectangularCollision({
             rectangle1: player,
@@ -166,7 +171,6 @@ function canGoThroughBoundaries(boundaries, axis, stepValue) {
             },
           })
         ) {
-          console.log('detected');
           return false;
         }
       }
@@ -175,6 +179,6 @@ function canGoThroughBoundaries(boundaries, axis, stepValue) {
       throw new SyntaxError(`The input axis ${axis} is not valid. Please use x or y`);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
