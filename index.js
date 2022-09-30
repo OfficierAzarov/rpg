@@ -148,25 +148,33 @@ window.addEventListener('keyup', (event) => {
   }
 });
 
-function canGoThroughBoundaries(boundaries, modifiedPosition, stepValue) {
-  for (let i = 0; i < boundaries.length; i++) {
-    const boundary = boundaries[i];
-    console.log(stepValue);
-    if (
-      detectRectangularCollision({
-        rectangle1: player,
-        rectangle2: {
-          ...boundary,
-          position: {
-            ...boundary.position,
-            [modifiedPosition]: boundary.position[modifiedPosition] + stepValue,
-          },
-        },
-      })
-    ) {
-      console.log('detected');
-      return false;
+function canGoThroughBoundaries(boundaries, axis, stepValue) {
+  try {
+    if (axis == 'x' || axis == 'y') {
+      for (let i = 0; i < boundaries.length; i++) {
+        const boundary = boundaries[i];
+        console.log(stepValue);
+        if (
+          detectRectangularCollision({
+            rectangle1: player,
+            rectangle2: {
+              ...boundary,
+              position: {
+                ...boundary.position,
+                [axis]: boundary.position[axis] + stepValue,
+              },
+            },
+          })
+        ) {
+          console.log('detected');
+          return false;
+        }
+      }
+      return true;
+    } else {
+      throw new SyntaxError(`The input axis ${axis} is not valid. Please use x or y`);
     }
+  } catch (error) {
+    console.log(error);
   }
-  return true;
 }
