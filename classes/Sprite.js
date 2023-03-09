@@ -3,7 +3,7 @@ class Sprite {
     this.image = image;
     this.position = position;
     this.velocity = velocity;
-    this.frames = { ...frames, value: 0, elapsed: 0 };
+    this.frames = { ...frames, value: 0, elapse: 0 };
 
     this.image.onload = () => {
       this.width = this.image.width / this.frames.max;
@@ -29,16 +29,28 @@ class Sprite {
       this.height
     );
 
-    if (this.frames.max > 1) {
-      this.frames.elapsed++;
+    this.animateEveryTenthFrame();
+  }
+
+  animateEveryTenthFrame() {
+    if (this.isMultipleImagesSprite(this.frames.max)) {
+      this.frames.elapse++;
     }
 
-    if (this.frames.max > 1 && this.frames.elapsed % 10 === 0) {
+    if (this.isTenthFrame(this.frames.elapse)) {
       if (this.frames.value < this.frames.max - 1) {
         this.frames.value++;
       } else {
         this.frames.value = 0;
       }
     }
+  }
+
+  isMultipleImagesSprite(frameMax) {
+    if (frameMax > 1) return true;
+  }
+
+  isTenthFrame(elapse) {
+    if (elapse % 10 === 0) return true;
   }
 }
