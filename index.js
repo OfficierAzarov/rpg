@@ -21,13 +21,20 @@ const foreground = new Sprite({
   image: foregroundImage,
 });
 
-const playerImage = new Image();
-playerImage.src = './img/playerDown.png';
+const playerImageDown = new Image();
+playerImageDown.src = './img/playerDown.png';
+const playerImageUp = new Image();
+playerImageUp.src = './img/playerUp.png';
+const playerImageLeft = new Image();
+playerImageLeft.src = './img/playerLeft.png';
+const playerImageRight = new Image();
+playerImageRight.src = './img/playerRight.png';
+
 const playerImageWidth = 192;
 const playerImageHeight = 68;
 
 const player = new Sprite({
-  image: playerImage,
+  image: playerImageDown,
   frames: {
     max: 4,
   },
@@ -98,19 +105,31 @@ const animate = () => {
 
   if (keys.ArrowUp.isPressed && lastKeyPressed == 'ArrowUp') {
     canMove = canGoThroughBoundaries(boundaries, 'y', stepValue);
-    if (canMove) movables.forEach((movable) => move(movable, 'y', stepValue));
+    if (canMove) {
+      movables.forEach((movable) => move(movable, 'y', stepValue));
+      player.image = playerImageUp;
+    }
   }
   if (keys.ArrowDown.isPressed && lastKeyPressed == 'ArrowDown') {
     canMove = canGoThroughBoundaries(boundaries, 'y', -stepValue);
-    if (canMove) movables.forEach((movable) => move(movable, 'y', -stepValue));
+    if (canMove) {
+      movables.forEach((movable) => move(movable, 'y', -stepValue));
+      player.image = playerImageDown;
+    }
   }
   if (keys.ArrowLeft.isPressed && lastKeyPressed == 'ArrowLeft') {
     canMove = canGoThroughBoundaries(boundaries, 'x', stepValue);
-    if (canMove) movables.forEach((movable) => move(movable, 'x', stepValue));
+    if (canMove) {
+      movables.forEach((movable) => move(movable, 'x', stepValue));
+      player.image = playerImageLeft;
+    }
   }
   if (keys.ArrowRight.isPressed && lastKeyPressed == 'ArrowRight') {
     canMove = canGoThroughBoundaries(boundaries, 'x', -stepValue);
-    if (canMove) movables.forEach((movable) => move(movable, 'x', -stepValue));
+    if (canMove) {
+      movables.forEach((movable) => move(movable, 'x', -stepValue));
+      player.image = playerImageRight;
+    }
   }
 };
 
